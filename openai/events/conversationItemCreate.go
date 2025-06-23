@@ -11,9 +11,15 @@ type conversationItem struct {
 	Content []conversationItemContent `json:"content"`
 }
 
+type conversationItemFuncCall struct {
+	Type   string `json:"type"`
+	CallID string `json:"call_id"`
+	Output string `json:"output"`
+}
+
 type ConversationItemEvent struct {
-	Type string           `json:"type"`
-	Item conversationItem `json:"item"`
+	Type string      `json:"type"`
+	Item interface{} `json:"item"`
 }
 
 func BuildConversationCreateMsg(userInput string) ConversationItemEvent {
@@ -25,6 +31,17 @@ func BuildConversationCreateMsg(userInput string) ConversationItemEvent {
 			Content: []conversationItemContent{
 				{Type: "input_text", Text: userInput},
 			},
+		},
+	}
+}
+
+func BuildConvCreateCallFuncMsg(callId string, output string) ConversationItemEvent {
+	return ConversationItemEvent{
+		Type: "conversation.item.create",
+		Item: conversationItemFuncCall{
+			Type:   "function_call_output",
+			CallID: callId,
+			Output: output,
 		},
 	}
 }

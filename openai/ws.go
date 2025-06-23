@@ -26,7 +26,7 @@ func (c *Client) createWSConnection() *websocket.Conn {
 		for {
 			_, message, err := ws.ReadMessage()
 			if err != nil {
-				log.Println(err)
+				log.Fatal("read:", err)
 				return
 			}
 

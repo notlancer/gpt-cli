@@ -31,6 +31,9 @@ func Login(token string) *Client {
 	client := Client{Token: token}
 	client.Ws = client.createWSConnection()
 
+	sessionUpdateMsg := events.BuildSessionUpdateMsg()
+	client.SendWsMessage(sessionUpdateMsg)
+
 	return &client
 }
 

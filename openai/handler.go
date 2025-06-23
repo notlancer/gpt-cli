@@ -3,6 +3,8 @@ package openai
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/notlancer/gpt-cli/openai/events"
+	"strconv"
 )
 
 type WsMessageHandler struct {
@@ -11,19 +13,46 @@ type WsMessageHandler struct {
 
 var wsMessagesHandlers = map[string]WsMessageHandler{
 	"response.text.delta": {
-		Callback: ResponseTextDelta,
+		Callback: responseTextDeltaEvent,
 	},
 	"response.content_part.done": {
-		Callback: ContentPartDone,
+		Callback: contentPartDoneEvent,
+	},
+	"response.function_call_arguments.done": {
+		Callback: responseFunCallArgEvent,
 	},
 }
 
-func ContentPartDone(client *Client, _ map[string]interface{}) {
+func responseFunCallArgEvent(client *Client, message map[string]interface{}) {
+	argumentsRaw := message["arguments"].(string)
+	var arguments map[string]int
+
+	err := json.Unmarshal([]byte(argumentsRaw), &arguments)
+	if err != nil {
+		fmt.Println("Error unmarshaling:", err)
+		return
+	}
+
+	callId := message["call_id"].(string)
+	var sum = arguments["number1"] * arguments["number2"]
+
+	// i know it's could be float, wip!
+	responseMsg := events.BuildConvCreateCallFuncMsg(callId, strconv.Itoa(sum))
+
+	client.SendWsMessage(responseMsg)
+
+	responseCreate := events.BuildResponseCreateMsg()
+	client.SendWsMessage(responseCreate)
+
+	fmt.Println("called func call")
+}
+
+func contentPartDoneEvent(client *Client, _ map[string]interface{}) {
 	println()
 	RequestUserInput(client)
 }
 
-func ResponseTextDelta(_ *Client, message map[string]interface{}) {
+func responseTextDeltaEvent(_ *Client, message map[string]interface{}) {
 	fmt.Print(message["delta"])
 }
 

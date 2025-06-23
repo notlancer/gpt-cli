@@ -16,7 +16,7 @@ func main() {
 	client := openai.Login(app.Env.BearerToken)
 
 	log.Println("connected successfully to openai ws")
-	fmt.Print("Hello there, im ChatGPT, talk to me :)\n")
+	fmt.Print("Hello there, im ChatGPT, wbu?\n")
 
 	openai.RequestUserInput(client)
 
