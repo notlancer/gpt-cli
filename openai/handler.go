@@ -3,6 +3,7 @@ package openai
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 )
 
 type WsMessageHandler struct {
@@ -27,7 +28,7 @@ func responseFunCallArgEvent(client *Client, message map[string]interface{}) {
 
 	err := json.Unmarshal([]byte(argumentsRaw), &arguments)
 	if err != nil {
-		fmt.Println("Error unmarshaling:", err)
+		log.Fatal("Error unmarshaling:", err)
 		return
 	}
 
@@ -50,7 +51,7 @@ func HandleWsMessage(client *Client, rawMessage []byte) {
 
 	err := json.Unmarshal(rawMessage, &message)
 	if err != nil {
-		fmt.Println("Error unmarshaling:", err)
+		log.Fatal("Error unmarshaling:", err)
 		return
 	}
 

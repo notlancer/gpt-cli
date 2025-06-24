@@ -1,8 +1,8 @@
 package openai
 
 import (
+	"fmt"
 	"github.com/notlancer/gpt-cli/openai/events"
-	"strconv"
 )
 
 type FuncCallHandlerStruct struct {
@@ -24,7 +24,7 @@ func FuncCallHandler(client *Client, funcCallName string, args map[string]any, c
 func multipleFunCall(client *Client, args map[string]any, callID string) {
 	sum := args["number1"].(float64) * args["number2"].(float64)
 
-	responseMsg := events.BuildConvCreateCallFuncMsg(callID, strconv.FormatFloat(sum, 'f', -1, 64))
+	responseMsg := events.BuildConvCreateCallFuncMsg(callID, fmt.Sprintf("%f", sum))
 
 	client.SendWsMessage(responseMsg)
 
