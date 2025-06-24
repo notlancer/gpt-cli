@@ -39,7 +39,7 @@ func responseFunCallArgEvent(client *Client, message map[string]interface{}) {
 
 func contentPartDoneEvent(client *Client, _ map[string]interface{}) {
 	println()
-	RequestUserInput(client)
+	go RequestUserInput(client)
 }
 
 func responseTextDeltaEvent(_ *Client, message map[string]interface{}) {
