@@ -3,8 +3,6 @@ package openai
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/notlancer/gpt-cli/openai/events"
-	"strconv"
 )
 
 type WsMessageHandler struct {
@@ -25,7 +23,7 @@ var wsMessagesHandlers = map[string]WsMessageHandler{
 
 func responseFunCallArgEvent(client *Client, message map[string]interface{}) {
 	argumentsRaw := message["arguments"].(string)
-	var arguments map[string]int
+	var arguments map[string]any
 
 	err := json.Unmarshal([]byte(argumentsRaw), &arguments)
 	if err != nil {
@@ -34,17 +32,8 @@ func responseFunCallArgEvent(client *Client, message map[string]interface{}) {
 	}
 
 	callId := message["call_id"].(string)
-	var sum = arguments["number1"] * arguments["number2"]
 
-	// i know it's could be float, wip!
-	responseMsg := events.BuildConvCreateCallFuncMsg(callId, strconv.Itoa(sum))
-
-	client.SendWsMessage(responseMsg)
-
-	responseCreate := events.BuildResponseCreateMsg()
-	client.SendWsMessage(responseCreate)
-
-	fmt.Println("called func call")
+	FuncCallHandler(client, message["name"].(string), arguments, callId)
 }
 
 func contentPartDoneEvent(client *Client, _ map[string]interface{}) {
