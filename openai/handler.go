@@ -3,6 +3,8 @@ package openai
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/notlancer/gpt-cli/openai/events"
+	"github.com/notlancer/gpt-cli/openai/funcCall"
 	"log"
 )
 
@@ -34,12 +36,18 @@ func responseFunCallArgEvent(client *Client, message map[string]interface{}) {
 
 	callId := message["call_id"].(string)
 
-	FuncCallHandler(client, message["name"].(string), arguments, callId)
+	if ok, returnEvent := funcCall.Handler(message["name"].(string), arguments, callId); ok {
+		SendWsMessage(client.ws, returnEvent)
+
+		responseCreate := events.BuildResponseCreateMsg()
+		SendWsMessage(client.ws, responseCreate)
+	}
 }
 
 func contentPartDoneEvent(client *Client, _ map[string]interface{}) {
 	println()
-	go RequestUserInput(client)
+
+	client.StartUserGPTChat()
 }
 
 func responseTextDeltaEvent(_ *Client, message map[string]interface{}) {

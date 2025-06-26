@@ -28,7 +28,12 @@ type Property struct {
 	Description string `json:"description"`
 }
 
-func BuildSessionUpdateMsg() SessionUpdateEvent {
+const (
+	ArgumentMultipleKeyFirst  = "number1"
+	ArgumentMultipleKeySecond = "number2"
+)
+
+func BuildSessionUpdateFuncCallMsg() SessionUpdateEvent {
 	return SessionUpdateEvent{
 		Type: "session.update",
 		Session: Session{
@@ -41,16 +46,16 @@ func BuildSessionUpdateMsg() SessionUpdateEvent {
 					Parameters: Parameters{
 						Type: "object",
 						Properties: map[string]Property{
-							"number1": {
+							ArgumentMultipleKeyFirst: {
 								Type:        "number",
 								Description: "The first number.",
 							},
-							"number2": {
+							ArgumentMultipleKeySecond: {
 								Type:        "number",
 								Description: "The second number.",
 							},
 						},
-						Required: []string{"number1", "number2"},
+						Required: []string{ArgumentMultipleKeyFirst, ArgumentMultipleKeySecond},
 					},
 				},
 			},

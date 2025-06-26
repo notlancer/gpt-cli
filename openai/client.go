@@ -2,66 +2,48 @@ package openai
 
 import (
 	"bufio"
-	"encoding/json"
 	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/notlancer/gpt-cli/openai/events"
-	"log"
+	"github.com/notlancer/gpt-cli/openai/funcCall"
 	"os"
 	"strings"
 )
 
-const (
-	WsScheme = "wss"
-	WsHost   = "api.openai.com"
-	WsPath   = "/v1/realtime"
-	WsQuery  = "model=gpt-4o-mini-realtime-preview-2024-12-17"
-
-	AuthorizationHeaderKey = "Authorization"
-	OpenaiBetaHeaderKey    = "OpenAI-Beta"
-	OpenaiBetaHeaderValue  = "realtime=v1"
-)
-
 type Client struct {
 	Token string
-	Ws    *websocket.Conn
+	ws    *websocket.Conn
 }
 
 func Login(token string) *Client {
 	client := Client{Token: token}
-	client.Ws = client.createWSConnection()
+	client.ws = CreateWSConnection(client.Token)
 
-	sessionUpdateMsg := events.BuildSessionUpdateMsg()
-	client.SendWsMessage(sessionUpdateMsg)
+	sessionUpdateEvent := funcCall.GetUpdateSessionFunCall()
+	SendWsMessage(client.ws, sessionUpdateEvent)
+
+	ListenToWsMessage(client.ws, &client)
 
 	return &client
 }
 
-func RequestUserInput(client *Client) {
-	reader := bufio.NewReader(os.Stdin)
-
-	fmt.Print("...: ")
-
-	input, _ := reader.ReadString('\n')
-	input = strings.TrimSpace(input)
-
-	startMessage := events.BuildConversationCreateMsg(input)
-	client.SendWsMessage(startMessage)
+func (c *Client) SendChatMsg(msg string) {
+	startMessage := events.BuildConversationCreateMsg(msg)
+	SendWsMessage(c.ws, startMessage)
 
 	responseCreate := events.BuildResponseCreateMsg()
-	client.SendWsMessage(responseCreate)
+	SendWsMessage(c.ws, responseCreate)
 }
 
-func (c *Client) SendWsMessage(msg interface{}) {
-	rawMsg, err := json.Marshal(msg)
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
+func (c *Client) StartUserGPTChat() {
+	go func() {
+		reader := bufio.NewReader(os.Stdin)
 
-	err = c.Ws.WriteMessage(websocket.TextMessage, rawMsg)
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
+		fmt.Print("...: ")
+
+		input, _ := reader.ReadString('\n')
+		strings.TrimSpace(input)
+
+		c.SendChatMsg(input)
+	}()
 }

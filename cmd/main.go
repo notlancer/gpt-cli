@@ -18,7 +18,7 @@ func main() {
 	log.Println("connected successfully to openai ws")
 	fmt.Print("Hello there, im ChatGPT, wbu?\n")
 
-	go openai.RequestUserInput(client)
+	client.StartUserGPTChat()
 
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
