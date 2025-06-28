@@ -1,17 +1,17 @@
-package events
+package builders
 
-type conversationItemContent struct {
+type ConversationItemContent struct {
 	Type string `json:"type"`
 	Text string `json:"text"`
 }
 
-type conversationItem struct {
+type ConversationItem struct {
 	Type    string                    `json:"type"`
 	Role    string                    `json:"role"`
-	Content []conversationItemContent `json:"content"`
+	Content []ConversationItemContent `json:"content"`
 }
 
-type conversationItemFuncCall struct {
+type ConversationItemFuncCall struct {
 	Type   string `json:"type"`
 	CallID string `json:"call_id"`
 	Output string `json:"output"`
@@ -22,13 +22,20 @@ type ConversationItemEvent struct {
 	Item interface{} `json:"item"`
 }
 
+type ResponseCreateEvent struct {
+	Type     string `json:"type"`
+	Response struct {
+		Modalities []string `json:"modalities"`
+	} `json:"response"`
+}
+
 func BuildConversationCreateMsg(userInput string) ConversationItemEvent {
 	return ConversationItemEvent{
 		Type: "conversation.item.create",
-		Item: conversationItem{
+		Item: ConversationItem{
 			Type: "message",
 			Role: "user",
-			Content: []conversationItemContent{
+			Content: []ConversationItemContent{
 				{Type: "input_text", Text: userInput},
 			},
 		},
@@ -38,10 +45,19 @@ func BuildConversationCreateMsg(userInput string) ConversationItemEvent {
 func BuildConvCreateCallFuncMsg(callId string, output string) ConversationItemEvent {
 	return ConversationItemEvent{
 		Type: "conversation.item.create",
-		Item: conversationItemFuncCall{
+		Item: ConversationItemFuncCall{
 			Type:   "function_call_output",
 			CallID: callId,
 			Output: output,
 		},
+	}
+}
+
+func BuildResponseCreateMsg() ResponseCreateEvent {
+	return ResponseCreateEvent{
+		Type: "response.create",
+		Response: struct {
+			Modalities []string `json:"modalities"`
+		}{Modalities: []string{"text"}},
 	}
 }
