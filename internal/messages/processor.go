@@ -3,34 +3,21 @@ package messages
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/notlancer/gpt-cli/internal/builders"
 	"github.com/notlancer/gpt-cli/internal/functions"
 	"github.com/notlancer/gpt-cli/internal/interfaces"
 )
 
-type handlerStruct struct {
-	Callback func(MessageProcessor *MessageProcessor, message map[string]interface{}) error
-}
-
-var messageProcessorHandlers = map[string]handlerStruct{
+var messageProcessorHandlers = map[string]MessageProcessorHandler{
 	"response.text.delta": {
-		Callback: func(_ *MessageProcessor, message map[string]interface{}) error {
-			fmt.Print(message["delta"])
-
-			return nil
-		},
+		Callback: handleTextDelta,
 	},
 	"response.content_part.done": {
-		Callback: func(messageProcessor *MessageProcessor, message map[string]interface{}) error {
-			fmt.Println()
-
-			return messageProcessor.client.StartUserGPTChat()
-		},
+		Callback: handleContentPartDone,
 	},
 	"response.function_call_arguments.done": {
-		Callback: func(messageProcessor *MessageProcessor, message map[string]interface{}) error {
-			return messageProcessor.handleFunctionCall(message)
-		},
+		Callback: handleFunctionCallArgumentsDone,
 	},
 }
 

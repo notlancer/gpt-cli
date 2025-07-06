@@ -4,12 +4,14 @@ import (
 	"github.com/notlancer/gpt-cli/internal/builders"
 )
 
+type CallbackFunc func(args map[string]any, handler HandlerStruct, callID string) (bool, builders.ConversationItemEvent)
+
 type HandlerStruct struct {
-	Callback func(args map[string]any, handler HandlerStruct, callID string) (bool, builders.ConversationItemEvent)
+	Callback CallbackFunc
 	Tool     tool
 }
 
-type GenericCallback func(params map[string]interface{}) (interface{}, error)
+type GenericCallback func(params map[string]interface{}) (string, error)
 
 type tool struct {
 	Type        string     `json:"type"`
