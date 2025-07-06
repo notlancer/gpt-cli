@@ -8,16 +8,7 @@ func GetUpdateSessionFunCall() map[string]interface{} {
 	tools := make([]interface{}, 0, len(funcCallHandlers))
 
 	for _, handler := range funcCallHandlers {
-		tools = append(tools, map[string]interface{}{
-			"type":        handler.Tool.Type,
-			"name":        handler.Tool.Name,
-			"description": handler.Tool.Description,
-			"parameters": map[string]interface{}{
-				"type":       handler.Tool.Parameters.Type,
-				"properties": handler.Tool.Parameters.Properties,
-				"required":   handler.Tool.Parameters.Required,
-			},
-		})
+		tools = append(tools, handler.Tool)
 	}
 
 	return map[string]interface{}{
