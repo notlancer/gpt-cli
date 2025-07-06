@@ -11,7 +11,7 @@ func handleTextDelta(messageProcessor *MessageProcessor, message map[string]inte
 func handleContentPartDone(messageProcessor *MessageProcessor, message map[string]interface{}) error {
 	fmt.Println()
 
-	return nil
+	return messageProcessor.client.StartUserGPTChat()
 }
 
 func handleFunctionCallArgumentsDone(messageProcessor *MessageProcessor, message map[string]interface{}) error {

@@ -21,10 +21,6 @@ var messageProcessorHandlers = map[string]MessageProcessorHandler{
 	},
 }
 
-type MessageProcessor struct {
-	client interfaces.MessageClient
-}
-
 func NewMessageProcessor(client interfaces.MessageClient) *MessageProcessor {
 	return &MessageProcessor{client: client}
 }
